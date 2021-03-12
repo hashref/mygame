@@ -7,5 +7,9 @@
     ],
     "python.pythonPath": "~/projects/muddev/evenv/bin/python",
     "editor.formatOnSave": true,
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "119"
+    ]
 }

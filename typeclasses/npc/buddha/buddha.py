@@ -26,36 +26,34 @@ class CmdMeditate(default_cmds.MuxCommand):
         return message
 
     def func(self):
-        meditation_messages = (
-            self.obj.db.meditation_messages or DefaultMeditationMessages
-        )
-
-        if self.caller.attributes.has(self.state_key, category=self.category):
-            current_meditation_state = self.caller.attributes.get(
-                self.state_key, category=self.category
-            )
-
-            if current_meditation_state >= len(meditation_messages) - 1:
-                self.caller.attributes.remove(self.state_key, category=self.category)
-                self.caller.msg(self.__parse_message(meditation_messages[-1]))
-            else:
-                new_meditation_state = current_meditation_state + 1
-
-                self.caller.attributes.add(
-                    self.state_key, new_meditation_state, category=self.category
-                )
-                self.caller.msg(
-                    self.__parse_message(meditation_messages[current_meditation_state])
-                )
+        if self.caller.tags.get("enlightened with the %s" % self.obj.key, category="achievement"):
+            self.caller.msg("This buddha has nothing left to teach you.")
 
         else:
-            self.caller.attributes.add(
-                self.state_key,
-                1,
-                category=self.category,
-                lockstring="attread:perm('Admins');attredit('Admins')",
-            )
-            self.caller.msg(self.__parse_message(meditation_messages[0]))
+            meditation_messages = self.obj.db.meditation_messages or DefaultMeditationMessages
+
+            if self.caller.attributes.has(self.state_key, category=self.category):
+                current_meditation_state = self.caller.attributes.get(self.state_key, category=self.category)
+
+                if current_meditation_state >= len(meditation_messages) - 1:
+                    self.caller.attributes.remove(self.state_key, category=self.category)
+                    self.caller.tags.add("enlightened with the %s" % self.obj.key, category="achievement")
+                    self.caller.msg(self.__parse_message(meditation_messages[-1]))
+
+                else:
+                    new_meditation_state = current_meditation_state + 1
+
+                    self.caller.attributes.add(self.state_key, new_meditation_state, category=self.category)
+                    self.caller.msg(self.__parse_message(meditation_messages[current_meditation_state]))
+
+            else:
+                self.caller.attributes.add(
+                    self.state_key,
+                    1,
+                    category=self.category,
+                    lockstring="attread:perm('Admins');attredit('Admins')",
+                )
+                self.caller.msg(self.__parse_message(meditation_messages[0]))
 
 
 class BuddhaCmdSet(CmdSet):
