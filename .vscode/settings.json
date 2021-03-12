@@ -1,0 +1,11 @@
+{
+    "cSpell.words": [
+        "buddhacmdset",
+        "cmdset",
+        "evennia",
+        "mygame"
+    ],
+    "python.pythonPath": "~/projects/muddev/evenv/bin/python",
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black"
+}
