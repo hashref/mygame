@@ -31,4 +31,5 @@ class Character(DefaultCharacter):
 
     """
 
-    pass
+    def at_object_creation(self):
+        self.db.groups = []
