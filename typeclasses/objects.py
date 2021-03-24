@@ -10,7 +10,9 @@ the other types, you can do so by adding this as a multiple
 inheritance.
 
 """
-from evennia import DefaultObject
+from django.conf import settings
+from evennia import DefaultObject, utils
+from typeclasses.rooms import Room
 
 
 class Object(DefaultObject):
@@ -157,6 +159,14 @@ class Object(DefaultObject):
      at_say(speaker, message)  - by default, called if an object inside this
                                  object speaks
 
-     """
+    """
 
     pass
+
+
+class Group(DefaultObject):
+    def at_object_creation(self):
+        """
+        Group Object
+        """
+        self.db.members = []

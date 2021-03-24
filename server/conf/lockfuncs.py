@@ -31,6 +31,12 @@ lock functions from evennia.locks.lockfuncs.
 
 
 def membership(access_obj, accessed_obj, *args, **kwargs):
+    """
+    called in lockstring with membership('membership string').
+    A simple lock to determine if an object belongs to a particular group.
+    Returns true if the object belongs to the group.
+    Returns false if the object does not belong to the group.
+    """
     if args:
         group = args[0]
         if group in access_obj.db.groups:
