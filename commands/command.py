@@ -5,13 +5,10 @@ Commands describe the input the account can do to the game.
 
 """
 
-from django.conf import settings
 from evennia.commands.command import Command as BaseCommand
-from evennia.commands.default.building import ObjManipCommand
-from evennia.utils import create, dbref_to_obj
-from typeclasses.objects import Group
-
-# from evennia import default_cmds
+from evennia import default_cmds
+from evennia.utils import list_to_string
+from typeclasses.utils import capitalize
 
 
 class Command(BaseCommand):
@@ -34,60 +31,6 @@ class Command(BaseCommand):
             every command, like prompts.
 
     """
-
-    pass
-
-
-class CmdCreateGroup(ObjManipCommand):
-    """
-    Create a Membership Group
-
-    useage:
-      gcreate [text]
-
-    This command makes a group.
-    """
-
-    key = "gcreate"
-    locks = "cmd:perm(create) or perm(Builder)"
-    help_category = "Building"
-
-    new_obj_lockstring = "control:id({id}) or perm(Admin);delete:id({id}) or perm(Admin)"
-
-    def func(self):
-
-        caller = self.caller
-
-        if not self.args:
-            string = "Usage gcreate <newname> [:typeclass.path]"
-            caller.msg(string)
-            return
-
-        for objdef in self.lhs_objs:
-            string = ""
-            name = objdef["name"]
-            typeclass = Group
-
-            parent_group = dbref_to_obj(settings.PARENT_GROUP_DBREF, Group, raise_errors=True)
-
-            lockstring = self.new_obj_lockstring.format(id=caller.id)
-            obj = create.create_object(
-                typeclass, name, caller, home=parent_group, aliases=None, locks=lockstring, report_to=caller
-            )
-
-            if not obj:
-                continue
-
-            string = "You create a new %s: %s" % (obj.typename, obj.name)
-
-            if not obj.db.desc:
-                obj.db.desc = "You see nothing special"
-
-            obj.home = parent_group
-            obj.move_to(parent_group, quiet=True)
-
-        if string:
-            caller.msg(string)
 
     pass
 
@@ -244,3 +187,32 @@ class CmdCreateGroup(ObjManipCommand):
 #                 self.character = self.caller.get_puppet(self.session)
 #             else:
 #                 self.character = None
+
+
+class CmdViewMemberships(default_cmds.MuxCommand):
+    """
+    view group memberships you belong to
+
+    Usage:
+      memberships
+
+    This command returns a list of group memberships to which you belong.
+    """
+
+    key = "memberships"
+    aliases = "membership"
+    help_category = "General"
+
+    def func(self):
+
+        caller = self.caller
+
+        memberships = caller.get_memberships()
+        memberships.sort()
+
+        if len(memberships) == 0:
+            caller.msg("You aren't a member of anything.")
+        else:
+            articles = ["a", "an", "of", "the", "is"]
+            viewable_memberships = [capitalize(m, ["a", "an", "of", "the", "is"]) for m in memberships]
+            caller.msg("[ %s ]" % list_to_string(viewable_memberships, endsep=None))

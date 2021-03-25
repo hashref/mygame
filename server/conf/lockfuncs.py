@@ -38,8 +38,8 @@ def membership(access_obj, accessed_obj, *args, **kwargs):
     Returns false if the object does not belong to the group.
     """
     if args:
-        group = args[0]
-        if group in access_obj.db.groups:
+        group = args[0].lower()
+        if group in access_obj.get_memberships():
             return True
 
     return False

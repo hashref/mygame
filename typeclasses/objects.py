@@ -162,11 +162,3 @@ class Object(DefaultObject):
     """
 
     pass
-
-
-class Group(DefaultObject):
-    def at_object_creation(self):
-        """
-        Group Object
-        """
-        self.db.members = []
