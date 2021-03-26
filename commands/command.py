@@ -200,7 +200,6 @@ class CmdViewMemberships(default_cmds.MuxCommand):
     """
 
     key = "memberships"
-    help_category = "General"
 
     def func(self):
 
