@@ -15,7 +15,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 """
 
 from evennia import default_cmds
-from commands.command import CmdViewMemberships
+from commands.command import CmdViewMemberships, CmdMembership
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -36,6 +36,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         # any commands you add below will overload the default ones.
         #
         self.add(CmdViewMemberships())
+        self.add(CmdMembership())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

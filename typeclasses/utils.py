@@ -18,3 +18,7 @@ def capitalize(s, exceptions):
     for word in word_list[1:]:
         final.append(word if word in exceptions else word.capitalize())
     return " ".join(final)
+
+
+def proper_case_list(list, articles=["a", "an", "of", "the", "is"]):
+    return [capitalize(i, articles) for i in list]

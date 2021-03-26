@@ -10,9 +10,8 @@ the other types, you can do so by adding this as a multiple
 inheritance.
 
 """
-from django.conf import settings
-from evennia import DefaultObject, utils
-from typeclasses.rooms import Room
+from evennia import DefaultObject
+from evennia.utils import make_iter
 
 
 class Object(DefaultObject):
@@ -161,4 +160,5 @@ class Object(DefaultObject):
 
     """
 
-    pass
+    def get_memberships(self):
+        return make_iter(self.tags.get(category="membership") or [])
