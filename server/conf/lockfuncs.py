@@ -28,3 +28,18 @@ lock functions from evennia.locks.lockfuncs.
 #    """
 #    print "%s tried to access %s. Access denied." % (accessing_obj, accessed_obj)
 #    return False
+
+
+def membership(access_obj, accessed_obj, *args, **kwargs):
+    """
+    called in lockstring with membership('membership string').
+    A simple lock to determine if an object belongs to a particular group.
+    Returns true if the object belongs to the group.
+    Returns false if the object does not belong to the group.
+    """
+    if args:
+        group = args[0].lower()
+        if group in access_obj.get_memberships():
+            return True
+
+    return False

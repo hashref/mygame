@@ -6,8 +6,9 @@ Commands describe the input the account can do to the game.
 """
 
 from evennia.commands.command import Command as BaseCommand
-
-# from evennia import default_cmds
+from evennia import default_cmds
+from evennia.utils import list_to_string, search
+from typeclasses.utils import proper_case_list
 
 
 class Command(BaseCommand):
@@ -186,3 +187,128 @@ class Command(BaseCommand):
 #                 self.character = self.caller.get_puppet(self.session)
 #             else:
 #                 self.character = None
+
+
+class CmdViewMemberships(default_cmds.MuxCommand):
+    """
+    view group memberships you belong to
+
+    Usage:
+      memberships
+
+    This command returns a list of group memberships to which you belong.
+    """
+
+    key = "memberships"
+    help_category = "General"
+
+    def func(self):
+
+        caller = self.caller
+
+        memberships = caller.get_memberships()
+
+        if len(memberships) == 0:
+            caller.msg("You aren't a member of anything.")
+        else:
+            # memberships.sort()
+            caller.msg("[ %s ]" % list_to_string(proper_case_list(sorted(memberships)), endsep=None))
+
+
+class CmdMembership(default_cmds.MuxCommand):
+    """
+    handles the membership tags of a character
+
+    Usage:
+      membership[/switches] <obj> [= <membership>]
+
+    Switches:
+      del - remove the membership from object. If no membership
+            is specified, clear all memberships on object.
+
+    Manipulates and lists memberships on objects. Memberships are essentially
+    tags with 'category=membership'. These are used as "achievements" and are
+    lockable via the "membership()" lock.
+    """
+
+    key = "membership"
+    options = "del"
+    locks = "cmd:perm(membership) or perm(Builder)"
+    help_category = "Building"
+    arg_regex = r"(/\w+?(\s|$))|\s|$"
+
+    def func(self):
+
+        caller = self.caller
+        category = "membership"
+
+        if not self.args:
+            caller.msg("Usage: membership[/switches] <obj> [= <membership>]")
+            return
+
+        if "del" in self.switches:
+            # remove one or more memberships from an object
+            if not self.lhs:
+                caller.msg("Usage: membership/del <obj> [= <membership>]")
+                return
+
+            obj = caller.search(self.lhs, global_search=True)
+            if not obj:
+                return
+
+            if not obj.access(caller, "edit"):
+                caller.msg("You do not have permission to set this memberships for %s." % obj.key)
+                return
+
+            if self.rhs:
+                # remove a specific membership for object
+                if self.rhs.lower() not in obj.get_memberships():
+                    caller.msg("%s does not have this membership." % obj.key)
+                    return
+
+                else:
+                    obj.tags.remove(self.rhs.lower(), category=category)
+                    caller.msg("Membership has been removed from %s." % obj.key)
+                    return
+
+            else:
+                # remove all memberships from object
+                obj.tags.clear(category=category)
+
+                caller.msg("All memberships removed from %s." % obj.key)
+                return
+
+        if self.rhs:
+            obj = caller.search(self.lhs, global_search=True)
+            if not obj:
+                return
+
+            if not obj.access(caller, "edit"):
+                caller.msg("You do not have permission to set this memberships for %s." % obj.key)
+                return
+
+            if self.rhs.lower() in obj.get_memberships():
+                caller.msg("%s already a member." % obj.key)
+                return
+
+            obj.tags.add(self.rhs, category=category)
+            caller.msg("Membership has been added to %s." % obj.key)
+            return
+
+        else:
+            # list all object memberships
+            obj = caller.search(self.args, global_search=True)
+            if not obj:
+                return
+
+            if not obj.access(caller, "edit"):
+                caller.msg("You do not have permission view memberships for %s." % obj.key)
+                return
+
+            memberships = obj.get_memberships()
+
+            if len(memberships) == 0:
+                caller.msg("%s is not a member of anything." % obj.key)
+
+            else:
+                caller.msg("%s" % list_to_string(proper_case_list(sorted(memberships)), endsep=None))

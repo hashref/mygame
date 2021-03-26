@@ -11,6 +11,7 @@ inheritance.
 
 """
 from evennia import DefaultObject
+from evennia.utils import make_iter
 
 
 class Object(DefaultObject):
@@ -157,6 +158,7 @@ class Object(DefaultObject):
      at_say(speaker, message)  - by default, called if an object inside this
                                  object speaks
 
-     """
+    """
 
-    pass
+    def get_memberships(self):
+        return make_iter(self.tags.get(category="membership") or [])

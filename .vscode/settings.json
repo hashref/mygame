@@ -2,8 +2,11 @@
     "cSpell.words": [
         "buddhacmdset",
         "cmdset",
+        "dbref",
         "evennia",
-        "mygame"
+        "mygame",
+        "nofound",
+        "string"
     ],
     "python.pythonPath": "~/projects/muddev/evenv/bin/python",
     "editor.formatOnSave": true,

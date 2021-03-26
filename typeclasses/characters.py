@@ -8,6 +8,7 @@ creation commands.
 
 """
 from evennia import DefaultCharacter
+from evennia.utils import make_iter
 
 
 class Character(DefaultCharacter):
@@ -31,4 +32,5 @@ class Character(DefaultCharacter):
 
     """
 
-    pass
+    def get_memberships(self):
+        return make_iter(self.tags.get(category="membership") or [])
